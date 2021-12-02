@@ -1,0 +1,64 @@
+// Below is the implementation of the configuration for springfox
+
+@Configuration
+@EnableSwagger2
+public class SpringFoxConfig {
+
+  @Bean
+  public Docket api(){
+    return new Docket(DocumentationType.SWAGGER_2)
+    .useDefaultResponseMessages(false)
+    .groupName("<group_name>")
+    .apiInfo(apiInfo())
+    .select()
+    .paths(regex("/*"))
+    .build();
+  }
+  
+  private ApiInfo apiInfo() {
+    return new ApiInfoBuilder()
+      .title("Title")
+      .description("Description")
+      .version("1.0")
+      .build();
+  }
+}
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Below is the params (including optional param) defined for the controllers
+
+@RequestMapping(value = "/url", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Sample> urlFunc(@ApiParam(value = "String countryName", required = false) @RequestParam("countryName") final String countryName,
+    @ApiParam(value = "Optional String optionalCountryName", required = false) @RequestParam("optionalCountryName") final Optional<String> optionalCountryName) {
+    Sample sample = new Sample(sampleService.getClientCountry(), OffsetDateTime.now().toString());
+    LOGGER.info(sample.toString());
+    return new ResponseEntity<Sample>(sample, HttpStatus.OK);
+  }
+  /*--Sample is an entity with two class variables "country" type.string and "currentTime" type.string, with getters and setters --*/
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+The custom param @RequestParam("optionalCountryName") was not avaiable from the swagger, using springfox-swagger2 ver. 2.7.0 and springfox-swagger-ui 2.7.0
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>2.7.0</version>
+</dependency>
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.7.0</version>
+</dependency>
+
+
+This bug has been fixed and is not reproducable using springfox-swagger2 ver 3.0.0 and springfox-swagger-ui 2.9.2
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>3.0.0</version>
+</dependency>
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.9.2</version>
+</dependency>
